@@ -9,6 +9,7 @@ class QuinielaModel:
 
     def predict(self, predict_data):
         # Do something here to predict
+        print(predict_data)
         return ["X" for _ in range(len(predict_data))]
 
     @classmethod
