@@ -1,9 +1,10 @@
 import pickle
 
-from requests.packages import target
+# from requests.packages import target  # This line is not needed
 from sklearn.utils import resample
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
+
 
 class QuinielaModel:
 
@@ -61,7 +62,7 @@ class QuinielaModel:
         """ Load model from file """
         with open(filename, "rb") as f:
             model = pickle.load(f)
-            assert type(model) == cls
+            assert isinstance(model, cls)
         return model
 
     def save(self, filename):
