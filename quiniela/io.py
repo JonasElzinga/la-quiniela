@@ -15,11 +15,12 @@ def load_until_matchday(season, division, matchday):
     if data.empty:
         raise ValueError("There is no matchday data for the values given")
 
-    # keep the full data for season[0], season[1], season[2], and keep only the data until matchday for season[3]
-    temp_data = data[data["season"] == season[3]]
+    # keep the full data for the seasons before the last one (maximum 3, less if less are found)
+    # keep only the data until matchday for the last season
+    temp_data = data[data["season"] == season[-1]]
     temp_data = temp_data[temp_data["matchday"] <= matchday]
 
-    data = pd.concat([data[data["season"] != season[3]], temp_data])
+    data = pd.concat([data[data["season"] != season[-1]], temp_data])
     return data
 
 
