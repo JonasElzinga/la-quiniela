@@ -1,6 +1,14 @@
 import pandas as pd
 
+
 def count_points(last_5):
+    """
+    Calculate the amount of points in the last 5 games accumulated
+
+    :param last_5: list of the last 5 results of a team. Example: ['W', 'W', 'T', 'L', 'W']
+
+    :return: the amount of points in the last 5 games accumulated
+    """
     if last_5 == 0:
         return 0
 
@@ -13,8 +21,16 @@ def count_points(last_5):
     return count
 
 
-# main function that cleans and extends the data
 def extend_data(input_data):
+    """
+    Main function that cleans and extends the data.
+    It adds features to the data that we want to use.
+
+    :param input_data: the data to be cleaned and extended
+
+    :return: the cleaned and extended data
+    """
+
     # clean the inputted dataframe
     # make a copy of the data so the original dataframe does not change
     data = input_data.copy()
@@ -181,7 +197,18 @@ def extend_data(input_data):
 
     return data.fillna(0)
 
-def keep_data(data, season = None, divsion = None, matchday = None):
+
+def keep_data(data, season=None, divsion=None, matchday=None):
+    """
+    Filter the data based on the given seasons, divisions and matchdays and return the filtered data
+
+    :param data: data to be filtered
+    :param season: the seasons to keep
+    :param divsion: the divisions to keep
+    :param matchday: the matchdays to keep
+
+    :return: the filtered data
+    """
     # keep the seasons that are given, if season is None, keep all seasons
     if season is None:
         season = data['season'].unique()

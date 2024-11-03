@@ -1,13 +1,27 @@
 import pickle
-
-# from requests.packages import target  # This line is not needed
 from sklearn.utils import resample
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
+
 class QuinielaModel:
 
     def train(self, train_data):
+        """
+        Trains the model with the training data.
+        Here we assume that the training data is already preprocessed by using the cli.py script.
+        The model is a Logistic Regression model with the hyperparameters C=1, class_weight="balanced", max_iter=1000, solver="lbfgs" and uses
+        the features we selected to get the best results. They are:
+        - prev_GF_away
+        - prev_GF_home_avg
+        - prev_W_away
+        - prev_rank_away
+        - prev_Pts_home
+        - prev_GF_away_avg
+        - prev_W_home
+
+        :param train_data: DataFrame with the preprocessed training data
+        """
         # balance the training data
         balanced_data = self.balance(train_data)
 
@@ -25,6 +39,12 @@ class QuinielaModel:
         self.model.fit(X, y)
 
     def predict(self, predict_data):
+        """
+        Predicts the winner of the matches in the predict_data DataFrame.
+
+        :param predict_data: DataFrame with the preprocessed data to predict.
+        :return: predictions: array with the predictions.
+        """
         # define the features
         features = ['prev_GF_away', 'prev_GF_home_avg', 'prev_W_away', 'prev_rank_away', 'prev_Pts_home',
                     'prev_GF_away_avg', 'prev_W_home']
