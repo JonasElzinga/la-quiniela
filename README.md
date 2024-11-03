@@ -1,6 +1,12 @@
 ## LaQuiniela of LaLiga
 
-Team members: XXX - XXX -XXX
+Team members:
+Carlos Pablo Villalta López - NIU: 1727276
+Jonas Daniel Elzinga - NIU: 1731222
+Moritz Marquardt - NIU: 1734959
+Oscar Mauricio Cardona Mejia - NIU: 1687394
+Raúl Alberto Argüello Cajicá - NIU: 1734898
+
 
 This repo contains the skeleton for you to build your first ML project. Use the data in ```laliga.sqlite``` to build a ML model that predicts the outcome of a matchday in LaLiga (Spanish Football League).
 
