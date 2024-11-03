@@ -25,6 +25,10 @@ def extend_data(input_data):
     """
     Main function that cleans and extends the data.
     It adds features to the data that we want to use.
+
+    :param input_data: the data to be cleaned and extended
+
+    :return: the cleaned and extended data
     """
 
     # clean the inputted dataframe

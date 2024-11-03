@@ -79,11 +79,16 @@ if __name__ == "__main__":
         logging.info(f"Training LaQuiniela model with seasons {args.training_seasons}")
         model = models.QuinielaModel()
 
+        # get the start and end year of the training seasons
         start_year, end_year = map(int, args.training_seasons[0].split('-'))
+        # get a list of the seasons to load, including 3 previous seasons that are needed for correct data extension
         load_seasons = [f"{start_year - 3}-{end_year - 3}", f"{start_year - 2}-{end_year - 2}", f"{start_year - 1}-{end_year - 1}"] + args.training_seasons
+        # load the data
         training_data = io.load_historical_data(load_seasons)
 
+        # preprocess the data by extending it
         training_data = preprocess_data.extend_data(training_data)
+        # keep only the data for the training seasons, remove the 3 years used for extension
         training_data = preprocess_data.keep_data(training_data, args.training_seasons, None, None)
 
         model.train(training_data)
@@ -93,19 +98,32 @@ if __name__ == "__main__":
         logging.info(f"Predicting matchday {args.matchday} in season {args.season}, division {args.division}")
         model = models.QuinielaModel.load(settings.MODELS_PATH / args.model_name)
 
+        # get the start and end year of the testing season
         start_year, end_year = map(int, args.season.split('-'))
+        # get a list of the seasons to load, including 3 previous seasons that are needed for correct data extension
         load_seasons = [f"{start_year - 3}-{end_year - 3}", f"{start_year - 2}-{end_year - 2}", f"{start_year - 1}-{end_year - 1}", args.season]
+        # load the data, the complete data for the previous 3 years and the data until the matchday for the testing season
         predict_data = io.load_until_matchday(load_seasons, args.division, args.matchday)
 
+        # preprocess the data by extending it
         predict_data = preprocess_data.extend_data(predict_data)
+        # keep only the data for the mathcday to predict
         predict_data = preprocess_data.keep_data(predict_data, [args.season], [args.division], [args.matchday])
 
-        print(predict_data[['home_team', 'away_team', 'winner']])
-
+        # predict the winners for all the matches in the matchday
         predict_data["pred"] = model.predict(predict_data)
+
+        # see how accurate the model is by getting the accuracy
+        accuracy = (predict_data["pred"] == predict_data["winner"]).mean()
+
+        # show the predictions
         predict_data = predict_data[['season', 'division', 'matchday', 'date', 'time', 'home_team', 'away_team', 'pred']]
         print(f"Matchday {args.matchday} - LaLiga - Division {args.division} - Season {args.season}")
         print("=" * 70)
         for _, row in predict_data.iterrows():
             print(f"{row['home_team']:^30s} vs {row['away_team']:^30s} --> {row['pred']}")
+        # and the accuracy
+        print(f"Model accuracy: {accuracy:.2f}")
+
+        # save the predictions into the sqlite database
         io.save_predictions(predict_data)
