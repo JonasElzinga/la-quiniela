@@ -7517,10 +7517,12 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="Model-Analysis">Model Analysis<a class="anchor-link" href="#Model-Analysis">¶</a></h1><p>In this notebook we test different machine learning methods, features and parameters in order to find the most ‘exact’ and suitable model for matchday predictions for the la quiniela game. This final summary of the tests and experiments we performed is structured as follows.</p>
-<p>Step 1: First we will describe how we preprocess the data in order to clean and extend the data and what features we add that we found interesting and promising. Here we also split the data into training and testing data to evaluate the different models and their accuracy.<br/>
-Step 2: Secondly we find the most important features that give the best accuracy across a selection of ML methods by comparing the prediction accuracy for random sets of features. From these we select the 5 most accurate feature sets and perform a hyperparameter optimization to find the best parameters for the corresponding ML method.<br/>
-Step 3: We then compare 4 models with these 5 feature sets with their optimised hyper parameters by comparing their accuracy and confusion matrices in order to find the best model. This model will be the model for our final implementation.<br/>
-Step 4: In this step we will evaluate the final model and show an example.</p>
+<ul>
+<li>Step 1: First we will describe how we preprocess the data in order to clean and extend the data and what features we add that we found interesting and promising. Here we also split the data into training and testing data to evaluate the different models and their accuracy.<br/></li>
+<li>Step 2: Secondly we find the most important features that give the best accuracy across a selection of ML methods by comparing the prediction accuracy for random sets of features. From these we select the 5 most accurate feature sets and perform a hyperparameter optimization to find the best parameters for the corresponding ML method.<br/></li>
+<li>Step 3: We then compare 4 models with these 5 feature sets with their optimised hyper parameters by comparing their accuracy and confusion matrices in order to find the best model. This model will be the model for our final implementation.<br/></li>
+<li>Step 4: In this step we will evaluate the final model and show an example.</li>
+</ul>
 </div>
 </div>
 </div>
@@ -9418,6 +9420,17 @@ Features: ['prev_W_home', 'prev_rank_away', 'prev_GA_away_avg', 'prev_Pts_away',
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Step-3:-Model-Comparison">Step 3: Model Comparison<a class="anchor-link" href="#Step-3:-Model-Comparison">¶</a></h2><p>Like said before, the models that we use are a logistic regression model, a random forest classifier, a support vector machine and a naive Bayes gaussian model. We choose these four models because they all have their own weaknesses and strengths that hopefully makes the results different so the best one can be chosen. To compare the models, they are fitted 5 different times with the 5 feature subsets that had the highest accuracy in step 2. The hyperparameters are tuned by the last part of step 2, so they are the best for the given subset of features. The accuracy of each model on each subset is shown below, and also a confusion matrix for every option is visible there. The confusion matrices are important, because with only the accuracy it is not really sure if the model is actually good. If a model has an accuracy of 48%, but that is because the majority of the data is home wins, and the model just always predicts home wins, then the model is not really good. The confusion matrix will show that the model only predicts home wins, and in that way the model can be discarded. If the confusion matrix shows a nice diagonal, meaning that it predicts a lot of ties as ties, home wins as home wins and away wins as away wins, but the accuracy is 45%, this model is still better than the last model described.</p>
 <p>What we can see from all these matrices and accuracies, is that Logistic regression model with feature subset <em>['prev_GF_away', 'prev_GF_home_avg', 'prev_W_away', 'prev_rank_away', 'prev_Pts_home', 'prev_GF_away_avg', 'prev_W_home']</em> (rank 4)  has an accuracy of 45% and the confusion matrix has a pretty good diagonal. This means that this model with that specific feature subset will be the model that will be used in the final program that will predict for a matchday what the results of the matches will be. Also, there was another configuration with similar accuracy in rank 2, but we chose this specific one because the f-score looked slightly better.</p>
+<p>The meaning of the selected features are the following:</p>
+<ul>
+<li>prev_GF_away: the total scored goals until the previous matchday (included) from the team that is now the away team.</li>
+<li>prev_GF_home_avg: the average scored goals from the team that is now the home team until the previous matchday (included).</li>
+<li>prev_GF_away_avg: same, but for the team that is now the away team.</li>
+<li>prev_W_home: the amount of wins the home team had before the current matchday</li>
+<li>prev_W_away: same, but for the away team.</li>
+<li>prev_Pts_home_avg: the number of points the home team has before the current matchday</li>
+<li>prev_rank_away: the rank of the away team just before the current matchday.</li>
+</ul>
+<p>This seems like a bit of a strange selection, but the results of the training look good and the features still make enough sense for us to believe this model will translate well into whatever we want to predict.</p>
 </div>
 </div>
 </div>
@@ -9451,10 +9464,7 @@ Features: ['prev_W_home', 'prev_rank_away', 'prev_GA_away_avg', 'prev_Pts_away',
 <div class="jp-InputPrompt jp-InputArea-prompt">In [77]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1">#features = ['GDD','prev_rank_home','prev_rank_away','prev_rank_diff','prev_GD_home','prev_GD_away','prev_last_5_diff']</span>
-
-
-<span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="p">(</span><span class="n">acc</span><span class="p">,</span> <span class="n">best_iteration</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">top_accuracies</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="p">(</span><span class="n">acc</span><span class="p">,</span> <span class="n">best_iteration</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">top_accuracies</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Rank </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">: Accuracy = </span><span class="si">{</span><span class="n">acc</span><span class="si">}</span><span class="s2">, Iteration = </span><span class="si">{</span><span class="n">best_iteration</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     
     <span class="n">features</span> <span class="o">=</span> <span class="n">features_list</span><span class="p">[</span><span class="n">best_iteration</span><span class="p">]</span>
