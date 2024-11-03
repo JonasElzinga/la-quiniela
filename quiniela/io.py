@@ -6,6 +6,15 @@ import settings
 
 
 def load_until_matchday(season, division, matchday):
+    """
+    Load all data until the matchday for the given seasons and division.
+
+    :param season: seasons to load.
+    :param division: division to load.
+    :param matchday: matchday to load until.
+
+    :return: data: DataFrame with the data loaded.
+    """
     with sqlite3.connect(settings.DATABASE_PATH) as conn:
         data = pd.read_sql(f"""
             SELECT * FROM Matches
@@ -25,6 +34,11 @@ def load_until_matchday(season, division, matchday):
 
 
 def load_historical_data(seasons):
+    """
+    Load all data for the given seasons.
+
+    :param seasons: seasons to load.
+    """
     with sqlite3.connect(settings.DATABASE_PATH) as conn:
         if seasons == "all":
             data = pd.read_sql("SELECT * FROM Matches", conn)
