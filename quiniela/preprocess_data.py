@@ -13,13 +13,14 @@ def count_points(last_5):
     return count
 
 
+# main function that cleans and extends the data
 def extend_data(input_data):
     # clean the inputted dataframe
     # make a copy of the data so the original dataframe does not change
     data = input_data.copy()
 
-    # drop NaN values (there are only NaN values left in the "score" column)
-    data.dropna(inplace=True)
+    # drop NaN values in the score column
+    data.dropna(subset=['score'], inplace=True)
 
     # create two new columns, one for the score of the home team, and one for the score of the away team, drop the score column
     data[['home_score', 'away_score']] = data['score'].str.split(':', expand=True).astype(int)
@@ -127,40 +128,58 @@ def extend_data(input_data):
     data.drop(columns=['team'], inplace=True)
 
     # space to add extra data to the data dataframe or change existing data
+    # change the values in the winner colum to the right values
     data['winner'] = data.apply(lambda row: 1 if row['winner'] == 1 else 2 if row['winner'] == 2 else 0, axis=1)
 
-    # Create a helper column to represent team pairs in an unordered manner
+    # add a goal difference difference column
+    data['GDD'] = (data['prev_GD_home'] - data['prev_GD_away']) / (data['matchday'] - 1)
+
+    # add columns for the average goals made and conceded for the home team and the away team
+    data['prev_GF_home_avg'] = data['prev_GF_home'] / (data['matchday'] - 1)
+    data['prev_GA_home_avg'] = data['prev_GA_home'] / (data['matchday'] - 1)
+    data['prev_GF_away_avg'] = data['prev_GF_away'] / (data['matchday'] - 1)
+    data['prev_GA_away_avg'] = data['prev_GA_away'] / (data['matchday'] - 1)
+
+    # add a column for the rank difference between the home and the away team
+    data['prev_rank_diff'] = data['prev_rank_home'] - data['prev_rank_away']
+
+    # add a column for the difference between the last_5 for home and away
+    data['prev_last_5_diff'] = data['prev_last_5_home'] - data['prev_last_5_away']
+
+    # don't know what these are called
+    data['prev_GFH_GAA'] = (data['prev_GF_home'] - data['prev_GA_away']) / (data['matchday'] - 1)
+    data['prev_GFA_GAH'] = (data['prev_GF_away'] - data['prev_GA_home']) / (data['matchday'] - 1)
+    data['prev_GDH_GDA'] = (data['prev_GFH_GAA'] - data['prev_GFA_GAH']) / (data['matchday'] - 1)
+
+    # add some columns with head to head data for each team pair
+    # add a column to represent team pairs in an unordered manner, this can be used to groupby
     data['team_pair'] = data.apply(lambda row: frozenset([row['home_team'], row['away_team']]), axis=1)
 
-    # Group by 'team_pair' instead of separate home and away teams to include all matches between the two teams
+    # add a column for a head to head last 5 ratio (shifted 1 so the match itself is not taken into account)
     data['head_to_head_last_5'] = data.groupby('team_pair')['winner'].transform(
-        lambda x: x.rolling(5, 1).apply(lambda y: sum(y == 1) / 5, raw=True)
-    )
+        lambda x: x.shift(1).rolling(5, 1).apply(lambda y: sum(y == 1) / 5, raw=True))
 
-    # 1. Head-to-Head Draw Ratio in the last 5 matches
+    # add a column for a head to head draw ratio for the last 5 games (shifted 1 so the match itself is not taken into account)
     data['head_to_head_draw_ratio'] = data.groupby('team_pair')['winner'].transform(
-        lambda x: x.rolling(5, 1).apply(lambda y: sum(y == 'X') / 5, raw=True)
-    )
+        lambda x: x.shift(1).rolling(5, 1).apply(lambda y: sum(y == 'X') / 5, raw=True))
 
-    # 2. Head-to-Head Average Goals Scored by Home Team in the last 5 matches
+    # add a column for a head to head average goals made in the last 5 games by the home team (shifted 1 so the match itself is not taken into account)
     data['head_to_head_avg_goals_home'] = data.groupby('team_pair')['home_score'].transform(
-        lambda x: x.rolling(5, 1).mean()
-    )
+        lambda x: x.shift(1).rolling(5, 1).mean())
 
-    # 3. Head-to-Head Average Goals Scored by Away Team in the last 5 matches
+    # add a column for a head to head average goals made in the last 5 games by the away team (shifted 1 so the match itself is not taken into account)
     data['head_to_head_avg_goals_away'] = data.groupby('team_pair')['away_score'].transform(
-        lambda x: x.rolling(5, 1).mean()
-    )
+        lambda x: x.shift(1).rolling(5, 1).mean())
 
-    # 4. Head-to-Head Goal Difference (Home Goals - Away Goals) in the last 5 matches
-    data['head_to_head_goal_diff'] = data.groupby('team_pair').apply(
-        lambda x: (x['home_score'] - x['away_score']).rolling(5, 1).mean()
-    ).reset_index(level=0, drop=True)
+    # add a column for a head to head goal difference in the last 5 games (shifted 1 so the match itself is not taken into account)
+    data['head_to_head_goal_diff'] = data.groupby('team_pair')[['home_score', 'away_score']].apply(
+        lambda x: (x['home_score'] - x['away_score']).shift(1).rolling(5, min_periods=1).mean()).reset_index(level=0,
+                                                                                                             drop=True)
 
-    # Drop the helper column to clean up the dataframe
+    # drop the team_pair column
     data.drop(columns=['team_pair'], inplace=True)
 
-    return data
+    return data.fillna(0)
 
 def keep_data(data, season = None, divsion = None, matchday = None):
     # keep the seasons that are given, if season is None, keep all seasons

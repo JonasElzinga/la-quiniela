@@ -3,8 +3,7 @@ import pickle
 # from requests.packages import target  # This line is not needed
 from sklearn.utils import resample
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-
+from sklearn.linear_model import LogisticRegression
 
 class QuinielaModel:
 
@@ -13,7 +12,8 @@ class QuinielaModel:
         balanced_data = self.balance(train_data)
 
         # define the features and the target
-        features = ['head_to_head_goal_diff', 'head_to_head_last_5']
+        features = ['prev_GF_away', 'prev_GF_home_avg', 'prev_W_away', 'prev_rank_away', 'prev_Pts_home',
+                    'prev_GF_away_avg', 'prev_W_home']
         target = 'winner'
 
         # create X and y
@@ -21,12 +21,13 @@ class QuinielaModel:
         y = balanced_data[target]
 
         # train the model
-        self.model = RandomForestClassifier(n_estimators=100, random_state=42)
+        self.model = LogisticRegression(C=1, class_weight="balanced", max_iter=1000, solver="lbfgs")
         self.model.fit(X, y)
 
     def predict(self, predict_data):
         # define the features
-        features = ['head_to_head_goal_diff', 'head_to_head_last_5']
+        features = ['prev_GF_away', 'prev_GF_home_avg', 'prev_W_away', 'prev_rank_away', 'prev_Pts_home',
+                    'prev_GF_away_avg', 'prev_W_home']
 
         # create X
         X = predict_data[features]
