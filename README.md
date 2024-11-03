@@ -1,16 +1,15 @@
 ## LaQuiniela of LaLiga
 
-Team members:
-Carlos Pablo Villalta López - NIU: 1727276
-Jonas Daniel Elzinga - NIU: 1731222
-Moritz Marquardt - NIU: 1734959
-Oscar Mauricio Cardona Mejia - NIU: 1687394
-Raúl Alberto Argüello Cajicá - NIU: 1734898
+Team members:<br>
+Carlos Pablo Villalta López - NIU: 1727276<br>
+Jonas Daniel Elzinga - NIU: 1731222<br>
+Moritz Marquardt - NIU: 1734959<br>
+Oscar Mauricio Cardona Mejia - NIU: 1687394<br>
+Raúl Alberto Argüello Cajicá - NIU: 1734898<br>
 
-
-This repo contains the skeleton for you to build your first ML project. Use the data in ```laliga.sqlite``` to build a ML model that predicts the outcome of a matchday in LaLiga (Spanish Football League).
-
-It also contains a PDF with some exercises to practice your Python skills as a Data Scientist.
+In this repository a few things can be found.<br>
+First of all, an analysis of LaLiga can be found in the reports folder under the name "LaLigaDataAnalysis.html", the analysis was done in a jupyter notebook under the same name which is stored in the analysis folder.<br>
+Secondly, a ML model is implemented in the quiniela folder. To find out which model we wanted to use we tried a lot of different things, all of which can be found in the analysis folder where it is stored in the legacy folder. The final choices that to us seemed the right ones were implemented in one final notebook, also stored in the analysis folder under the name "ModelAnalysis.ipynb". This notebook has also been made into a html file which is stored in the reports folder under the same name.<br>
 
 ### Repository structure
 
@@ -35,50 +34,33 @@ quiniela/
 ```
 
 ### How to run it
-
-You are provided with a fully-functional dummy model. Once you've installed dependences (```pip install -r requirements.txt```), which is only Pandas in this dummy case, you can try it yourself:
-
+To run the model that we implemented, it is first important to install all the dependencies. This can be done by running the following command in the terminal:
 ```console
-foo@bar:~$ python cli.py train --training_seasons 2010:2020
-Model succesfully trained and saved in ./models/my_quiniela.model
-foo@bar:~$ python cli.py predict 2021-2022 1 3
+pip install -r requirements.txt
+```
+After this is done, the model can be trained and tested. To train the model, the following command can be used:
+```console
+foo@bar:~$ python cli.py train --training_seasons {first year}:{last year}
+```
+Where {first year} is the first year that you want to train the model on and {last year} is the last year that you want to train the model on, all the seasons in between these years will be included (example, begin year is 2010 and end year is 2012, then the seasons 2010-2011 and 2011-2012 will be used to train). The trained model will then be saved in the models folder.<br>
+
+To then predict the outcome of a matchday, the following command can be used:
+```console
+foo@bar:~$ python cli.py predict {season} {division} {matchday}
+```
+Where {season} is the season that you want to predict the outcome of (this time the complete season, so for example 2020-2021), {division} is the division that you want to predict the outcome of and {matchday} is the matchday that you want to predict the outcome of. The prediction will then be printed in the terminal like this:
+```console
 Matchday 3 - LaLiga - Division 1 - Season 2021-2022
 ======================================================================
-         RCD Mallorca          vs            Espanyol            --> X
-           Valencia            vs             Alavés             --> X
-        Celta de Vigo          vs            Athletic            --> X
-        Real Sociedad          vs            Levante             --> X
-           Elche CF            vs           Sevilla FC           --> X
-          Real Betis           vs          Real Madrid           --> X
-          Barcelona            vs             Getafe             --> X
-           Cádiz CF            vs           CA Osasuna           --> X
-        Rayo Vallecano         vs           Granada CF           --> X
-       Atlético Madrid         vs           Villarreal           --> X
+         RCD Mallorca          vs            Espanyol            --> 1
+           Valencia            vs             Alavés             --> 1
+        Celta de Vigo          vs            Athletic            --> 0
+        Real Sociedad          vs            Levante             --> 0
+           Elche CF            vs           Sevilla FC           --> 2
+          Real Betis           vs          Real Madrid           --> 2
+          Barcelona            vs             Getafe             --> 1
+           Cádiz CF            vs           CA Osasuna           --> 1
+        Rayo Vallecano         vs           Granada CF           --> 0
+       Atlético Madrid         vs           Villarreal           --> 1
+Model accuracy: 0.40
 ```
-
-Here, we call ```train``` to train the model using seasons from 2010 to 2020, and then we perfom a prediction of 3rd matchday of 2021-2022 season at 1st Division using ```predict```. Of course, that's a terrible prediction: that's why it's a dummy model!! Call to ```train``` did literally nothing, and ```predict``` always return ```X ```. It is your job to make something interesting.
-
-Check out options on ```train``` and ```predict``` using ```-h``` option. You are free to add any other argument that you find necessary.
-
-### Your job
-
-You are asked to build a machine learning model that aims to predict the result of each match in a matchday --- either local team wins (```1```), visitor team wins (```2```) or there is a tie (```X```) ---. Use data in ```laliga.sqlite``` to build proper features and train any model you feel like the best for the case.
-
-Use Jupyter Notebooks to play around with your model until it feels ok to you. Use all notebooks that you need, storing them in ```analysis/``` folder. Don't panick about your code style in those notebooks, they are not going to be considered when grading. You are requested to write a final notebook called ```ModelAnalysis.ipynb```, and **this is the only one that is important** (meaning, is the only one that will be graded). This notebook must contain the training and evaluation of the final model: how good is it, where does it fail the most, what are the causes of its errors, what are the more important features and how they behave, etc. Also, export this notebook to HTML and place it in ```reports/``` folder.
-
-Then (and only then), once you are comfortable with the result, move your code to well-structured Python modules in ```quiniela/``` folder to convert your exploratory notebooks into a functional software. You can use the provided ```QuinielaModel``` and extend it, or make it your style. Add modules to ```quiniela/``` folder if you need so, add parameters to ```settings.py```, add arguments to ```cli.py```. Feel like home, this skeleton is just a base for you. The project is yours.
-
-You can use all the third-party libraries you want as long as they are available in the PyPI repositories (that is, as long as you can install them with ```pip```) and you explicitly add them in ```requirements.txt```.
-
-Needless to say, the model is not expected to get all the results right, far from it. Football is (luckily) highly unpredictable. If the model gets about 40%-50% right, you can already consider to be great.
-
-
-### Data
-
-The data is provided as a SQLite3 database that is inside the ZIP file. This database contains the following tables:
-
-   * ```Matches```: All the matches played between seasons 1928-1929 and 2021-2022 with the date and score. Columns are ```season```,	```division```, ```matchday```, ```date```, ```time```, ```home_team```, ```away_team```, ```score```. Have in mind there is no time information for many of them and also that it contains matches still not played from current season.
-   * ```Predictions```: The table for you to insert your predictions. It is initially empty. Columns are ```season```,	 ```timestamp```, ```division```, ```matchday```, ```home_team```, ```away_team```, ```prediction```, ```confidence```.
-
-The data source is [Transfermarkt](https://www.transfermarkt.com/), and it was scraped using Python's library BeautifulSoup4.
-
