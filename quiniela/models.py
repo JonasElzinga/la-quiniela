@@ -1,5 +1,4 @@
 import pickle
-from sklearn.utils import resample
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
@@ -58,7 +57,13 @@ class QuinielaModel:
         return predictions
 
     def balance(self, data):
-        # subsampling
+        """
+        Balances the training data by subsampling the majority classes to match the minority class.
+
+        :param data: DataFrame with the training data.
+
+        :return: balanced_data: DataFrame with the balanced training data.
+        """
         # find the minority catagory in the winner column
         minority_cat = min(data['winner'].value_counts())
 
