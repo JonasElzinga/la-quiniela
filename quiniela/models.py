@@ -58,23 +58,22 @@ class QuinielaModel:
         return predictions
 
     def balance(self, data):
-        # Separate each class into different DataFrames
-        class_1 = data[data['winner'] == 1]
-        class_0 = data[data['winner'] == 0]
-        class_2 = data[data['winner'] == 2]
+        # subsampling
+        # find the minority catagory in the winner column
+        minority_cat = min(data['winner'].value_counts())
 
-        # Find the size of the majority class
-        majority_size = class_1.shape[0]
+        # seperate each class
+        df_class_0 = data[data['winner'] == 0]
+        df_class_1 = data[data['winner'] == 1]
+        df_class_2 = data[data['winner'] == 2]
 
-        # Oversample the minority classes to match the majority class size
-        class_0_oversampled = resample(class_0, replace=True, n_samples=majority_size, random_state=42)
-        class_2_oversampled = resample(class_2, replace=True, n_samples=majority_size, random_state=42)
+        # subsample for each class if necessary
+        df_class_0_subsampled = df_class_0.sample(minority_cat, random_state=42)
+        df_class_1_subsampled = df_class_1.sample(minority_cat, random_state=42)
+        df_class_2_subsampled = df_class_2.sample(minority_cat, random_state=42)
 
-        # Concatenate the oversampled minority classes with the majority class
-        balanced_training_data = pd.concat([class_1, class_0_oversampled, class_2_oversampled])
-
-        # Shuffle the balanced data
-        balanced_data = balanced_training_data.sample(frac=1, random_state=42).reset_index(drop=True)
+        # concat each class into a final balanced training dataset
+        balanced_data = pd.concat([df_class_0_subsampled, df_class_1_subsampled, df_class_2_subsampled]).reset_index(drop=True)
 
         return balanced_data
 
