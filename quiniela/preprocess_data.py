@@ -9,13 +9,18 @@ def count_points(last_5):
 
     :return: the amount of points in the last 5 games accumulated
     """
+    # if there is no last 5 list, return 0
     if last_5 == 0:
         return 0
 
+    # initialize a count variable
     count = 0
+    # go trough all the elements of the last_5 list
     for i in last_5:
+        # if the element is a win, add 3 to the count
         if i == 'W':
             count += 3
+        # if the element is a tie, add 1 to the count
         elif i == 'T':
             count += 1
     return count
@@ -162,10 +167,14 @@ def extend_data(input_data):
     # add a column for the difference between the last_5 for home and away
     data['prev_last_5_diff'] = data['prev_last_5_home'] - data['prev_last_5_away']
 
-    # don't know what these are called
+    # add a column for the ratio of the difference between the goals scored by the home team and conceded by the away team
     data['prev_GFH_GAA'] = (data['prev_GF_home'] - data['prev_GA_away']) / (data['matchday'] - 1)
+
+    # add a column for the ratio of the difference between the goals conceded by the home team and scored by the away team
     data['prev_GFA_GAH'] = (data['prev_GF_away'] - data['prev_GA_home']) / (data['matchday'] - 1)
-    data['prev_GDH_GDA'] = (data['prev_GFH_GAA'] - data['prev_GFA_GAH']) / (data['matchday'] - 1)
+
+    # add a column for the difference between the two last ratios
+    data['prev_GDH_GDA'] = (data['prev_GFH_GAA'] - data['prev_GFA_GAH'])
 
     # add some columns with head to head data for each team pair
     # add a column to represent team pairs in an unordered manner, this can be used to groupby
