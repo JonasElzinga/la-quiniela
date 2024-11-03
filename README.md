@@ -27,7 +27,6 @@ quiniela/
   │          ...
   ├─── .gitignore
   ├─── cli.py					# Main executable. Entrypoint for CLI
-  ├─── laliga.sqlite			# The database
   ├─── README.md
   ├─── requirements.txt			# List of libraries needed to run the project
   └─── settings.py				# General parameters of the program
