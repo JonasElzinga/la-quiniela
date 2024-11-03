@@ -33,7 +33,7 @@ class QuinielaModel:
         X = balanced_data[features]
         y = balanced_data[target]
 
-        # train the model
+        # train the model using Logistig Regression with the optimal hyperparameters
         self.model = LogisticRegression(C=1, class_weight="balanced", max_iter=1000, solver="lbfgs")
         self.model.fit(X, y)
 
@@ -44,14 +44,14 @@ class QuinielaModel:
         :param predict_data: DataFrame with the preprocessed data to predict.
         :return: predictions: array with the predictions.
         """
-        # define the features
+        # define the features that we selected for the model
         features = ['prev_GF_away', 'prev_GF_home_avg', 'prev_W_away', 'prev_rank_away', 'prev_Pts_home',
                     'prev_GF_away_avg', 'prev_W_home']
 
-        # create X
+        # select the features from the data to predict
         X = predict_data[features]
 
-        # predict the winner
+        # predict the winner of the data to predict
         predictions = self.model.predict(X)
 
         return predictions
