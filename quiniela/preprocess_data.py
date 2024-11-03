@@ -23,7 +23,7 @@ def count_points(last_5):
 
 def extend_data(input_data):
     """
-    Main function that cleans and extends the data. 
+    Main function that cleans and extends the data.
     It adds features to the data that we want to use.
     """
 
